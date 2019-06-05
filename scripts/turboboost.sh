@@ -53,7 +53,7 @@ function check()
         exit 1
     fi
 
-    cpus=$(lscpu | sed -n 4p | awk '{ print $2 }')
+    cpus=$(lscpu | sed -n 5p | awk '{ print $2 }')
 
     if [ ${cpu} -ge ${cpus} ]; then
         echo "CPU id out of range"
@@ -73,7 +73,7 @@ function enable()
 {
     cpu=$1
 
-    cpus=$(lscpu | sed -n 4p | awk '{ print $2 }')
+    cpus=$(lscpu | sed -n 5p | awk '{ print $2 }')
 
     if [ -z "${cpu}" ]; then
         for (( i=0; i<${cpus}; i++ )); do 
@@ -94,7 +94,7 @@ function disable()
 {
     cpu=$1
 
-    cpus=$(lscpu | sed -n 4p | awk '{ print $2 }')
+    cpus=$(lscpu | sed -n 5p | awk '{ print $2 }')
 
     if [ -z "${cpu}" ]; then
         for (( i=0; i<${cpus}; i++ )); do 
