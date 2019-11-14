@@ -1,8 +1,8 @@
 
 Quartz: A DRAM-based performance emulator for NVM
+----------------------
 
 github: https://github.com/HewlettPackard/quartz
-----------------------
 
 Quartz leverages features available in commodity hardware to emulate
 different latency and bandwidth characteristics of future
