@@ -1,5 +1,6 @@
 
 Quartz: A DRAM-based performance emulator for NVM
+github: https://github.com/HewlettPackard/quartz
 ----------------------
 
 Quartz leverages features available in commodity hardware to emulate
@@ -130,6 +131,11 @@ enabled in a process's context. To restore the old behavior, write the value 2
 to /sys/devices/cpu/rdpmc if kernel version is 4.0 or greater:
 
     echo 2 | sudo tee /sys/devices/cpu/rdpmc
+
+Before run your application, make sure the msr module has been loaded, or you
+will get an error "wrmsr: open: No such file or directory":
+
+	sudo modprobe msr
 
 Run your application:
 
