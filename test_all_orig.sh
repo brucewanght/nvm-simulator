@@ -1,15 +1,15 @@
 #!/bin/bash
 
-dir0=1M_slb0
-dir1=1M_slb32
-dir2=1M_slb0_bf
-dir3=1M_slb32_bf
+dir0=10M_slb0
+dir1=10M_slb32
+dir2=10M_slb0_bf
+dir3=10M_slb32_bf
 
-btrees=(WOBTree Fast_Fair WORT WOART wB+Tree)
-num=1000000
+btrees=(WOBTree FAST_FAIR WORT WOART wB+Tree)
+num=10000000
 round=5
-wlats=(300 600 900 1200)
-run=../scripts/runenv.sh
+wlats=(0 300 600 900 1200)
+data=../100_million_normal.txt
 
 for bt in ${btrees[@]}
 do
@@ -30,7 +30,7 @@ do
 		echo "test $bt with $lat ns additional write latency ..."
 		for i in $(seq 1 $round)
 		do
-			sudo $run ./$bt -n $num -w $lat -c 0 -i 100_million_normal.txt >>$ds0/btree_perf_"$lat"ns.log
+			sudo ./$bt -n $num -w $lat -c 0 -i $data >>$ds0/btree_perf_"$lat"ns.log
 			sleep 5
 		done
 		#echo 3 >/proc/sys/vm/drop_caches
@@ -42,7 +42,7 @@ do
 		echo "test $bt with $lat ns additional write latency ..."
 		for i in $(seq 1 $round)
 		do
-			sudo $run ./$bt -n $num -w $lat -c 32 -i 100_million_normal.txt >>$ds1/btree_perf_"$lat"ns.log
+			sudo ./$bt -n $num -w $lat -c 32 -i $data >>$ds1/btree_perf_"$lat"ns.log
 			sleep 5
 		done
 		#echo 3 >/proc/sys/vm/drop_caches
@@ -54,7 +54,7 @@ do
 		echo "test $bt with $lat ns additional write latency ..."
 		for i in $(seq 1 $round)
 		do
-			sudo $run ./$bt -n $num -w $lat -c 0 -b -i 100_million_normal.txt >>$ds2/btree_perf_"$lat"ns.log
+			sudo ./$bt -n $num -w $lat -c 0 -b -i $data >>$ds2/btree_perf_"$lat"ns.log
 			sleep 5
 		done
 		#echo 3 >/proc/sys/vm/drop_caches
@@ -66,9 +66,12 @@ do
 		echo "test $bt with $lat ns additional write latency ..."
 		for i in $(seq 1 $round)
 		do
-			sudo $run ./$bt -n $num -w $lat -c 32 -b -i 100_million_normal.txt >>$ds3/btree_perf_"$lat"ns.log
+			sudo ./$bt -n $num -w $lat -c 32 -b -i $data >>$ds3/btree_perf_"$lat"ns.log
 			sleep 5
 		done
 		#echo 3 >/proc/sys/vm/drop_caches
 	done
+	echo 3 >/proc/sys/vm/drop_caches
+	echo 3 >/proc/sys/vm/drop_caches
+	echo 3 >/proc/sys/vm/drop_caches
 done
