@@ -13,14 +13,18 @@ else
 	fi
 fi
 
-dir0=1M_slb0
-dir1=1M_slb32
-dir2=1M_slb0_bf
-dir3=1M_slb32_bf
+#million of kvs in this test
+M=5
+num=`expr 1000000 \* $M`
+round=5
+
+#directories used for storing result
+dir0="$M"M_slb0
+dir1="$M"M_slb32
+dir2="$M"M_slb0_bf
+dir3="$M"M_slb32_bf
 
 btrees=(WOBTree FAST_FAIR WORT WOART wB+Tree)
-num=1000000
-round=5
 wlats=(300 600 900 1200)
 run=../scripts/runenv.sh
 data=../100_million_normal.txt
@@ -32,6 +36,7 @@ modprobe msr
 
 for bt in ${btrees[@]}
 do
+	echo 3 >/proc/sys/vm/drop_caches
 	ds0="$bt"_"$dir0"
 	ds1="$bt"_"$dir1"
 	ds2="$bt"_"$dir2"
@@ -64,7 +69,6 @@ do
 			sudo $run ./$bt -n $num -w $lat -c 0 -i $data >>$ds0/btree_perf_"$lat"ns.log
 			sleep 5
 		done
-		#echo 3 >/proc/sys/vm/drop_caches
 	done
 
 	echo "test $bt with 32MB SLB ..."
@@ -76,7 +80,6 @@ do
 			sudo $run ./$bt -n $num -w $lat -c 32 -i $data >>$ds1/btree_perf_"$lat"ns.log
 			sleep 5
 		done
-		#echo 3 >/proc/sys/vm/drop_caches
 	done
 
 	echo "test $bt without SLB but with BloomFilter ..."
@@ -88,7 +91,6 @@ do
 			sudo $run ./$bt -n $num -w $lat -c 0 -b -i $data >>$ds2/btree_perf_"$lat"ns.log
 			sleep 5
 		done
-		#echo 3 >/proc/sys/vm/drop_caches
 	done
 
 	echo "test $bt with 32MB SLB and BloomFilter ..."
@@ -100,8 +102,8 @@ do
 			sudo $run ./$bt -n $num -w $lat -c 32 -b -i $data >>$ds3/btree_perf_"$lat"ns.log
 			sleep 5
 		done
-		#echo 3 >/proc/sys/vm/drop_caches
 	done
+	echo 3 >/proc/sys/vm/drop_caches
 	mv $ds0 $1
 	mv $ds1 $1
 	mv $ds2 $1
