@@ -14,7 +14,7 @@ else
 fi
 
 #million of kvs in this test
-M=5
+M=1
 num=`expr 1000000 \* $M`
 round=5
 
@@ -26,16 +26,15 @@ dir3="$M"M_slb32_bf
 
 btrees=(WOBTree FAST_FAIR WORT WOART wB+Tree)
 wlats=(300 600 900 1200)
-run=../scripts/runenv.sh
-data=../100_million_seq.txt
 
-#load emulator's kernel module
-../scripts/setupdev.sh load
-#load the msr module
-modprobe msr
+#perf command for cache stat
+run="perf stat -e instructions,cycles,cache-references,cache-misses,L1-dcache-loads,L1-dcache-load-misses,L1-dcache-stores,L1-icache-load-misses,LLC-loads,LLC-stores,LLC-load-misses,LLC-store-misses"
+
+data=../100_million_normal.txt
 
 for bt in ${btrees[@]}
 do
+	echo 3 >/proc/sys/vm/drop_caches
 	ds0="$bt"_"$dir0"
 	ds1="$bt"_"$dir1"
 	ds2="$bt"_"$dir2"
@@ -65,7 +64,7 @@ do
 		echo "test $bt with $lat ns additional write latency ..."
 		for i in $(seq 1 $round)
 		do
-			sudo $run ./$bt -n $num -w $lat -c 0 -i $data >>$ds0/"$bt"_"$lat"ns.log
+			sudo $run ./$bt -n $num -w $lat -c 0 -i $data >>$ds0/cache_stat_"$lat"ns.log 2>&1
 			sleep 5
 		done
 	done
@@ -76,7 +75,7 @@ do
 		echo "test $bt with $lat ns additional write latency ..."
 		for i in $(seq 1 $round)
 		do
-			sudo $run ./$bt -n $num -w $lat -c 32 -i $data >>$ds1/"$bt"_"$lat"ns.log
+			sudo $run ./$bt -n $num -w $lat -c 32 -i $data >>$ds1/cache_stat_"$lat"ns.log 2>&1
 			sleep 5
 		done
 	done
@@ -87,7 +86,7 @@ do
 		echo "test $bt with $lat ns additional write latency ..."
 		for i in $(seq 1 $round)
 		do
-			sudo $run ./$bt -n $num -w $lat -c 0 -b -i $data >>$ds2/"$bt"_"$lat"ns.log
+			sudo $run ./$bt -n $num -w $lat -c 0 -b -i $data >>$ds2/cache_stat_"$lat"ns.log 2>&1
 			sleep 5
 		done
 	done
@@ -98,7 +97,7 @@ do
 		echo "test $bt with $lat ns additional write latency ..."
 		for i in $(seq 1 $round)
 		do
-			sudo $run ./$bt -n $num -w $lat -c 32 -b -i $data >>$ds3/"$bt"_"$lat"ns.log
+			sudo $run ./$bt -n $num -w $lat -c 32 -b -i $data >>$ds3/cache_stat_"$lat"ns.log 2>&1
 			sleep 5
 		done
 	done
